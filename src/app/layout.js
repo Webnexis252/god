@@ -1,5 +1,6 @@
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
+import EntranceReveal from "@/components/EntranceReveal";
 
 export const metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -81,6 +82,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" dir="ltr">
       <body>
+        <EntranceReveal />
         {children}
         <script
           type="application/ld+json"

@@ -38,7 +38,7 @@ export default function HeroSection() {
             ? {
                 initial: prefersReducedMotion ? false : { opacity: 0, y: 42 },
                 animate: prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 },
-                transition: { duration: 0.85, ease: [0.16, 1, 0.3, 1] },
+                transition: { duration: 0.85, delay: 1.6, ease: [0.16, 1, 0.3, 1] },
               }
             : {})}
         >
@@ -68,7 +68,7 @@ export default function HeroSection() {
                 animate: prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 },
                 transition: {
                   duration: 0.8,
-                  delay: 0.08,
+                  delay: 1.68,
                   ease: [0.16, 1, 0.3, 1],
                 },
               }

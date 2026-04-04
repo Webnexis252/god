@@ -85,31 +85,6 @@ export default function Home() {
       <main>
         <HeroSection />
 
-        <section className="proof-band" aria-labelledby="proof-band-title">
-          <MotionReveal>
-            <div>
-              <p className="section-eyebrow">Built for conversion</p>
-              <h2 className="section-title" id="proof-band-title">
-                A homepage should explain the offer before it tries to impress.
-              </h2>
-            </div>
-          </MotionReveal>
-
-          <MotionReveal delay={0.08} className="proof-metrics" aria-label="Agency metrics">
-            <div className="metric">
-              <span className="metric-value">48h</span>
-              <span className="metric-label">Average proposal turnaround</span>
-            </div>
-            <div className="metric">
-              <span className="metric-value">AA</span>
-              <span className="metric-label">Accessibility-first baseline</span>
-            </div>
-            <div className="metric">
-              <span className="metric-value">SEO</span>
-              <span className="metric-label">Metadata, sitemap, robots included</span>
-            </div>
-          </MotionReveal>
-        </section>
 
         <section className="services-section" data-section="services" id="services">
           <MotionReveal className="section-heading">
