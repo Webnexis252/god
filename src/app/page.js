@@ -4,6 +4,7 @@ import ContactForm from "@/components/ContactForm";
 import HeroSection from "@/components/HeroSection";
 import MotionReveal from "@/components/MotionReveal";
 import ParallaxBlock from "@/components/ParallaxBlock";
+import ProjectRail from "@/components/ProjectRail";
 import ServicesList from "@/components/ServicesList";
 import { siteConfig } from "@/lib/site";
 import { servicesData } from "@/lib/services";
@@ -167,22 +168,10 @@ export default function Home() {
             {otherProjects.map((project, index) => (
               <MotionReveal
                 key={project.name}
-                className="project-rail"
                 delay={0.06 * index}
                 distance={44}
               >
-                <div className="project-rail-meta">
-                  <p className="project-category">{project.category}</p>
-                  <h3 className="project-name">{project.name}</h3>
-                </div>
-                <p className="project-summary">{project.summary}</p>
-                <div className="project-rail-visual" aria-hidden="true">
-                  {project.image ? (
-                    <img src={project.image} alt={project.name} className="project-rail-img" />
-                  ) : (
-                    <div className="project-rail-img-empty"></div>
-                  )}
-                </div>
+                <ProjectRail project={project} />
               </MotionReveal>
             ))}
           </div>
