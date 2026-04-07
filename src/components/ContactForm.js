@@ -8,7 +8,7 @@ const initialState = {
   status: "idle",
   message: "",
   errors: {},
-  mailtoLink: "",
+  whatsappLink: "",
 };
 
 export default function ContactForm() {
@@ -175,23 +175,40 @@ export default function ContactForm() {
           ) : null}
         </label>
 
-        <div className="contact-actions">
-          <button className="primary-button" type="submit" disabled={pending}>
-            {pending ? "Reviewing brief..." : "Prepare my quote request"}
-          </button>
-          <p className="contact-note">
-            Prefer email? Reach us directly at{" "}
-            <a className="inline-link" href={`mailto:${siteConfig.email}`}>
-              {siteConfig.email}
+        {state.status === "success" && state.whatsappLink ? (
+          <div className="contact-success-state">
+            <h3 className="service-title">Brief Captured Successfully</h3>
+            <p className="contact-note" style={{ marginBottom: "1.5rem" }}>
+              We've received your request via email. However, you can instantly open a direct line with our team by sending your pre-filled brief via WhatsApp.
+            </p>
+            <a 
+              className="primary-button" 
+              href={state.whatsappLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ padding: "1rem 2rem", fontSize: "1.1rem" }}
+            >
+              Send directly to our WhatsApp
             </a>
-            .
-          </p>
-        </div>
+          </div>
+        ) : (
+          <div className="contact-actions">
+            <button className="primary-button" type="submit" disabled={pending}>
+              {pending ? "Reviewing brief..." : "Prepare my quote request"}
+            </button>
+            <p className="contact-note">
+              Prefer email? Reach us directly at{" "}
+              <a className="inline-link" href={`mailto:${siteConfig.email}`}>
+                {siteConfig.email}
+              </a>
+              .
+            </p>
+          </div>
+        )}
 
-        <p className={`form-status is-${state.status}`} aria-live="polite">
+        <p className={`form-status is-${state.status}`} aria-live="polite" style={{ marginTop: "1rem" }}>
           {state.message || "We reply with next steps, scope clarity, and a realistic build plan."}
         </p>
-
 
       </form>
     </div>

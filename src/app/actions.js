@@ -45,46 +45,6 @@ function buildEmailHtml(fields) {
   `;
 }
 
-// ─── WhatsApp via CallMeBot (free, no account needed) ─────────────────────────
-// Activation (one-time): Save +34 644 59 21 64 on WhatsApp, then send:
-//   "I allow callmebot to send me messages"
-// You'll receive your CALLMEBOT_API_KEY instantly in reply.
-
-async function sendWhatsApp(fields) {
-  const apiKey = process.env.CALLMEBOT_API_KEY;
-
-  if (!apiKey) {
-    console.warn("[WhatsApp] CALLMEBOT_API_KEY not set — skipping.");
-    return { ok: false, error: "CallMeBot API key not configured." };
-  }
-
-  const message = encodeURIComponent(buildPlainText(fields));
-
-  // Send to each agency phone number
-  const phones = siteConfig.phones.map((p) => p.replace(/[\s\-+]/g, "").replace(/^0/, "91"));
-
-  const results = await Promise.allSettled(
-    phones.map((phone) =>
-      fetch(
-        `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${message}&apikey=${apiKey}`,
-        { method: "GET", cache: "no-store" }
-      ).then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res;
-      })
-    )
-  );
-
-  results.forEach((r, i) => {
-    if (r.status === "rejected") {
-      console.error(`[WhatsApp] Failed to send to ${phones[i]}:`, r.reason);
-    }
-  });
-
-  const anySuccess = results.some((r) => r.status === "fulfilled");
-  return { ok: anySuccess, error: anySuccess ? null : "All WhatsApp sends failed." };
-}
-
 // ─── Email via Nodemailer (SMTP) ──────────────────────────────────────────────
 
 async function sendEmail(fields) {
@@ -151,33 +111,31 @@ export async function submitLeadAction(_prevState, formData) {
       status: "error",
       message: "A few details still need attention before we can review the brief.",
       errors,
-      mailtoLink: "",
+      whatsappLink: "",
     };
   }
 
-  // 3. Fire both notifications concurrently
-  const [whatsappResult, emailResult] = await Promise.all([
-    sendWhatsApp(fields),
-    sendEmail(fields),
-  ]);
+  // 3. Fire email notification concurrently
+  const emailResult = await sendEmail(fields);
 
-  if (!whatsappResult.ok) console.error("[Action] WhatsApp failed:", whatsappResult.error);
-  if (!emailResult.ok)    console.error("[Action] Email failed:",    emailResult.error);
-
-  // 4. Return response — succeed if at least one channel worked
-  if (!whatsappResult.ok && !emailResult.ok) {
-    return {
-      status: "error",
-      message: "We received your brief but could not send the notification. Please email us directly.",
-      errors: {},
-      mailtoLink: "",
-    };
+  if (!emailResult.ok) {
+    console.error("[Action] Email failed:", emailResult.error);
   }
+
+  // 4. Generate the official WhatsApp Click-to-Chat Link
+  // Clean phone number (e.g., "+91 95609 67377" -> "919560967377")
+  // Using the primary (first) number from config, or default to missing string if undefined
+  const rawPhone = siteConfig.phones?.[0] || "";
+  let cleanPhone = rawPhone.replace(/[\s\-\+]/g, "");
+  // Note: if the number starts with 0 locally, logic may be needed, but we assume international format.
+  
+  const textMessage = encodeURIComponent(buildPlainText(fields));
+  const whatsappLink = `https://wa.me/${cleanPhone}?text=${textMessage}`;
 
   return {
     status: "success",
-    message: "Your quote request has been submitted! We will review your brief and be in touch shortly.",
+    message: "Brief captured! Click below to send this directly to our WhatsApp to instantly open a chat with our team.",
     errors: {},
-    mailtoLink: "",
+    whatsappLink,
   };
 }
