@@ -13,40 +13,31 @@ import { servicesData } from "@/lib/services";
 
 const projects = [
   {
-    name: "Astra Commerce",
-    category: "E-commerce Design",
+    name: "DivergentClasses",
+    category: "LMS Platform",
     summary:
-      "Homepage concept focused on premium motion, product clarity, and a stronger quote-to-checkout path.",
-    deliverables: ["Hero strategy", "Spline scene slot", "Checkout narrative"],
-    outcome: "Outcome: improve clarity, raise trust, increase inquiry quality.",
-    image: "/project-1.jpg", // Replace with your image
+      "A comprehensive Learning Management System for a coaching institute, designed to prepare students for UCEED, NIFT, and NAT exams.",
+    deliverables: ["Course Management", "Student Dashboard", "Exam Prep Modules"],
+    outcome: "Outcome: streamlined learning experience, higher student engagement, and structured preparation.",
+    image: "/DivergentClassesNew.jpeg", // Replace with your image
   },
   {
-    name: "Northline Studio",
-    category: "Agency Redesign",
+    name: "Cake it easy",
+    category: "Bakery E-commerce",
     summary:
-      "Editorial-style service page system built to replace a template feel with a more intentional brand posture.",
-    deliverables: ["Messaging architecture", "Case study templates", "Mobile navigation"],
-    outcome: "Outcome: better differentiation and faster lead qualification.",
-    image: "/project-2.jpg", // Replace with your image
+      "An inviting online storefront for a cake shop located at 500 Terry Francine St, San Francisco, focusing on easy ordering and a delightful brand presence.",
+    deliverables: ["Online Ordering System", "Menu Showcase", "Local SEO"],
+    outcome: "Outcome: simplified customer orders, wider local reach, and improved online aesthetic.",
+    image: "/CakeItEasy.jpeg", // Replace with your image
   },
   {
-    name: "Vanta Health",
-    category: "Product Site",
+    name: "Bound & Beyond",
+    category: "Library Website",
     summary:
-      "B2B website direction with cleaner proof hierarchy, stronger CTA placement, and less friction in the contact path.",
-    deliverables: ["Proof system", "FAQ content layout", "Lead capture flow"],
-    outcome: "Outcome: clearer offer understanding in the first screen.",
-    image: "/project-3.jpg", // Replace with your image
-  },
-  {
-    name: "Helio Labs",
-    category: "Interactive Launch",
-    summary:
-      "Motion-led landing page concept for a product reveal with strong pacing, atmospheric depth, and careful fallback behavior.",
-    deliverables: ["3D hero staging", "Scroll choreography", "Launch readiness QA"],
-    outcome: "Outcome: more memorable first impression without image dependencies.",
-    image: "/project-4.jpg", // Replace with your image
+      "A digital gateway for a community library situated at Liberty St, Ashville, PA 16613, USA, focused on catalog exploration and community event discovery.",
+    deliverables: ["Digital Catalog", "Event Management", "Community Hub"],
+    outcome: "Outcome: improved access to resources, easier event registration, and stronger community engagement.",
+    image: "/BoundAndBeyond.jpeg", // Replace with your image
   },
 ];
 
