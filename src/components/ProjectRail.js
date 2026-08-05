@@ -61,7 +61,7 @@ export default function ProjectRail({ project }) {
           </ul>
           <div className="project-rail-expand-actions">
             <p className="project-rail-outcome">{project.outcome}</p>
-            <a className="project-rail-cta" href="#contact">
+            <a className="project-rail-cta" href={`/work/${project.slug}`}>
               View case study
               <span className="project-rail-cta-arrow" aria-hidden="true">→</span>
             </a>

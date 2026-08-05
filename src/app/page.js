@@ -8,38 +8,11 @@ import ProjectRail from "@/components/ProjectRail";
 import ServicesList from "@/components/ServicesList";
 import { siteConfig } from "@/lib/site";
 import { servicesData } from "@/lib/services";
+import { projects } from "@/lib/projects";
+import Footer from "@/components/Footer";
 
 
 
-const projects = [
-  {
-    name: "DivergentClasses",
-    category: "LMS Platform",
-    summary:
-      "A comprehensive Learning Management System for a coaching institute, designed to prepare students for UCEED, NIFT, and NAT exams.",
-    deliverables: ["Course Management", "Student Dashboard", "Exam Prep Modules"],
-    outcome: "Outcome: streamlined learning experience, higher student engagement, and structured preparation.",
-    image: "/DivergentClassesNew.jpeg", // Replace with your image
-  },
-  {
-    name: "Cake it easy",
-    category: "Bakery E-commerce",
-    summary:
-      "An inviting online storefront for a cake shop located at 500 Terry Francine St, San Francisco, focusing on easy ordering and a delightful brand presence.",
-    deliverables: ["Online Ordering System", "Menu Showcase", "Local SEO"],
-    outcome: "Outcome: simplified customer orders, wider local reach, and improved online aesthetic.",
-    image: "/CakeItEasy.jpeg", // Replace with your image
-  },
-  {
-    name: "Bound & Beyond",
-    category: "Library Website",
-    summary:
-      "A digital gateway for a community library situated at Liberty St, Ashville, PA 16613, USA, focused on catalog exploration and community event discovery.",
-    deliverables: ["Digital Catalog", "Event Management", "Community Hub"],
-    outcome: "Outcome: improved access to resources, easier event registration, and stronger community engagement.",
-    image: "/BoundAndBeyond.jpeg", // Replace with your image
-  },
-];
 
 const processSteps = [
   {
@@ -145,7 +118,7 @@ export default function Home() {
               <p className="project-outcome">{featuredProject.outcome}</p>
 
               <div className="project-actions">
-                <a className="text-link" href="#contact">
+                <a className="text-link" href={`/work/${featuredProject.slug}`}>
                   View case study outline
                 </a>
                 <a className="text-link" href="#contact">
@@ -239,26 +212,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="footer">
-        <MotionReveal className="footer-brand">
-          <p className="footer-logo">{siteConfig.name}</p>
-          <p className="footer-copy">
-            Highly technical, creative, and professional digital services for ambitious businesses that require exceptional execution.
-          </p>
-        </MotionReveal>
-
-        <MotionReveal className="footer-links" delay={0.08}>
-          <a href="#services">Services</a>
-          <a href="#work">Work</a>
-          <a href="#process">Process</a>
-          <a href="#contact">Contact</a>
-        </MotionReveal>
-
-        <MotionReveal className="footer-bottom" delay={0.12}>
-          <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-          <p>© 2026 {siteConfig.name}. All rights reserved.</p>
-        </MotionReveal>
-      </footer>
+      <Footer />
     </>
   );
 }
