@@ -455,16 +455,21 @@ export default function SplineContainer({
     }
 
     let resumeTimeoutId = 0;
+    let isScrolling = false;
 
     const handleScroll = () => {
-      scrollPausedRef.current = true;
-      syncPlayback();
+      if (!isScrolling) {
+        isScrolling = true;
+        scrollPausedRef.current = true;
+        syncPlayback();
+      }
 
       if (resumeTimeoutId) {
         window.clearTimeout(resumeTimeoutId);
       }
 
       resumeTimeoutId = window.setTimeout(() => {
+        isScrolling = false;
         scrollPausedRef.current = false;
         syncPlayback();
       }, 140);
