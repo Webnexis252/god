@@ -116,8 +116,14 @@ ol {
 
 /* ─────────────────────────────────────────
    Entrance preloader
-   Everything that moves here is a transform or opacity animation, so it keeps
-   running on the compositor while the 3D scene occupies the main thread.
+   Four rings of type set on circles, after Codrops' Circular Text Effect (MIT).
+   The rings scale in around a gold disc that carries the load count; when the
+   page is ready they blow outwards and the backdrop clears.
+   Everything that moves here is a transform or opacity animation on an HTML
+   box, so it keeps running on the compositor while the 3D scene occupies the
+   main thread. Each ring is three boxes so the three movements never fight
+   over one transform: .entrance-ring arrives, .entrance-ring-out leaves, and
+   the svg inside turns.
 ───────────────────────────────────────── */
 
 html[data-entrance="loading"] body {
@@ -125,9 +131,14 @@ html[data-entrance="loading"] body {
 }
 
 .entrance {
+  /* The artboard the rings are drawn on (1400 units) is this wide on screen */
+  --dim: 186vmin;
+  /* The disc: the original's 90px, smaller where the innermost ring is */
+  --core: clamp(4rem, 17vmin, 5.625rem);
   position: fixed;
   inset: 0;
   z-index: 9999;
+  overflow: hidden;
   /* If scripts never run, step aside instead of covering the page forever. */
   animation: entrance-failsafe 1ms linear 12s forwards;
 }
@@ -140,165 +151,129 @@ html[data-entrance="loading"] body {
   to { visibility: hidden; }
 }
 
-.entrance-panel {
+.entrance-backdrop {
   position: absolute;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+  inset: 0;
   background: #07090d;
-  overflow: hidden;
-  will-change: transform;
-  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1) 120ms;
+  transition: opacity 700ms ease 350ms;
 }
 
-.entrance-panel-top {
-  top: 0;
-  bottom: 50%;
-  align-items: flex-end;
-  padding-bottom: 1.9rem;
-}
-
-.entrance-panel-bottom {
-  top: 50%;
-  bottom: 0;
-  align-items: flex-start;
-  padding-top: 1.4rem;
-}
-
-.entrance[data-phase="exit"] .entrance-panel-top {
-  transform: translateY(-100%);
-}
-
-.entrance[data-phase="exit"] .entrance-panel-bottom {
-  transform: translateY(100%);
-}
-
-/* Both panels carry the same viewport-sized backdrop, so it reads as one image until they part. */
-.entrance-glow,
-.entrance-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 200%;
-  pointer-events: none;
-}
-
-.entrance-panel-bottom .entrance-glow,
-.entrance-panel-bottom .entrance-grid {
-  top: -100%;
-}
-
-.entrance-glow {
-  background:
-    radial-gradient(ellipse 60% 44% at 50% 50%, rgba(227, 183, 107, 0.18), transparent 70%),
-    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(88, 111, 157, 0.12), transparent 60%);
-  animation: entrance-glow-pulse 2s ease-in-out infinite alternate;
-}
-
-@keyframes entrance-glow-pulse {
-  from { opacity: 0.7; }
-  to   { opacity: 1; }
-}
-
-.entrance-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 5rem 5rem;
-  mask-image: radial-gradient(ellipse 70% 60% at center, rgba(0, 0, 0, 0.6), transparent 80%);
-}
-
-.entrance-logo,
-.entrance-meter {
-  position: relative;
-  animation: entrance-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  transition: opacity 360ms ease;
-}
-
-.entrance[data-phase="exit"] .entrance-logo,
-.entrance[data-phase="exit"] .entrance-meter {
+.entrance[data-phase="exit"] .entrance-backdrop {
   opacity: 0;
 }
 
-@keyframes entrance-rise {
+/* --span is the ring's share of the artboard, --i its place in the stagger
+   (0 is the outermost), --out how far it grows on the way out, --turn how long
+   one full drift takes. EntranceReveal sets them. */
+.entrance-ring {
+  --box: calc(var(--dim) * var(--span));
+  position: absolute;
+  top: calc(50% - var(--box) / 2);
+  left: calc(50% - var(--box) / 2);
+  width: var(--box);
+  height: var(--box);
+  pointer-events: none;
+  animation: entrance-arrive 2500ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 125ms) backwards;
+}
+
+@keyframes entrance-arrive {
   from {
     opacity: 0;
-    transform: translateY(0.7rem);
+    transform: scale(0.3);
   }
 }
 
-.entrance-logo {
-  width: clamp(11rem, 34vw, 16rem);
-  aspect-ratio: 8 / 3;
-  object-fit: contain;
+.entrance-ring-out {
+  width: 100%;
+  height: 100%;
+  transition:
+    transform 1300ms cubic-bezier(0.87, 0, 0.13, 1) calc(var(--i) * 60ms),
+    opacity 1300ms cubic-bezier(0.87, 0, 0.13, 1) calc(var(--i) * 60ms);
+}
+
+.entrance[data-phase="exit"] .entrance-ring-out {
+  opacity: 0;
+  transform: scale(var(--out));
+}
+
+/* A slow drift, each ring against its neighbours, so a long load never looks stuck. */
+.entrance-ring-spin {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: entrance-turn var(--turn) linear infinite;
+}
+
+.entrance-ring.is-counter .entrance-ring-spin {
+  animation-direction: reverse;
+}
+
+@keyframes entrance-turn {
+  to { transform: rotate(360deg); }
+}
+
+/* --weight and --stretch give each ring its cut of the display family. */
+.entrance-ring-text {
+  fill: #3f3b33;
+  font-family: var(--font-display);
+  font-weight: var(--weight);
+  font-stretch: var(--stretch);
+  text-transform: uppercase;
   user-select: none;
 }
 
-.entrance-meter {
-  width: min(18rem, 72vw);
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  animation-delay: 90ms;
-}
-
-.entrance-status {
-  color: var(--text-dim);
-}
-
-.entrance-count {
-  color: var(--accent-strong);
-  font-variant-numeric: tabular-nums;
-}
-
-/* The progress bar is the seam the page opens along. */
-.entrance-seam {
+/* The disc the original uses as its Enter button. Here it reports the load. */
+.entrance-core {
   position: absolute;
-  top: 50%;
-  left: 0;
+  top: calc(50% - var(--core) / 2);
+  left: calc(50% - var(--core) / 2);
+  width: var(--core);
+  height: var(--core);
+  animation: entrance-arrive 2500ms cubic-bezier(0.16, 1, 0.3, 1) 500ms backwards;
+}
+
+.entrance-core-disc {
+  display: grid;
+  place-items: center;
   width: 100%;
-  height: 2px;
-  margin-top: -1px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  transition: opacity 280ms ease;
-}
-
-.entrance[data-phase="exit"] .entrance-seam {
-  opacity: 0;
-}
-
-.entrance-seam-fill,
-.entrance-seam-glint {
-  position: absolute;
-  top: 0;
-  left: 0;
   height: 100%;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #171108;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition:
+    transform 1100ms cubic-bezier(0.87, 0, 0.13, 1),
+    opacity 1100ms cubic-bezier(0.87, 0, 0.13, 1);
 }
 
-.entrance-seam-fill {
-  width: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-  transform: scaleX(0);
-  transform-origin: left center;
+.entrance[data-phase="exit"] .entrance-core-disc {
+  opacity: 0;
+  transform: scale(0.7);
 }
 
-.entrance-seam-glint {
-  width: 20%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
-  animation: entrance-glint 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
+@media (prefers-reduced-motion: reduce) {
+  .entrance-ring,
+  .entrance-core,
+  .entrance-ring-spin {
+    animation: none;
+  }
 
-@keyframes entrance-glint {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(500%); }
+  .entrance-backdrop {
+    transition: none;
+  }
+
+  .entrance-ring-out,
+  .entrance-core-disc {
+    transition: none;
+  }
+
+  .entrance[data-phase="exit"] .entrance-ring-out,
+  .entrance[data-phase="exit"] .entrance-core-disc {
+    transform: none;
+  }
 }
 
 main {
