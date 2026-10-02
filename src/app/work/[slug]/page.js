@@ -1,13 +1,76 @@
 import { notFound } from "next/navigation";
-import { projects } from "@/lib/projects";
+import Image from "next/image";
+import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import MotionReveal from "@/components/MotionReveal";
+import CaseHero from "@/components/CaseHero";
+import CaseInk from "@/components/CaseInk";
+import CaseOutcome from "@/components/CaseOutcome";
+import CaseNext from "@/components/CaseNext";
+import { siteConfig } from "@/lib/site";
+import { projects } from "@/lib/projects";
+
+/* ─────────────────────────────────────────────────
+   Case Study Page — The Opened Plate
+   • On the homepage each project is a closed plate.
+     This page is that plate opened: the project's
+     colour at the size of the screen, its name larger
+     still, and the screenshot shown whole
+   • The story is told beneath it on the dark ground,
+     the colour returns once for the outcome, and the
+     page ends on the next project's plate
+   • Each section has its own layout: the opened
+     plate, two stepped columns of reading text, three
+     stacked lines, an uneven set of frames (only when
+     a project has gallery images), a closing line,
+     and the next plate
+   • This file stays a server component. Whatever
+     moves with the scroll lives in a small client
+     component of its own
+   ───────────────────────────────────────────────── */
 
 export function generateStaticParams() {
   return projects.map((project) => ({
     slug: project.slug,
   }));
+}
+
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const project = projects.find((p) => p.slug === slug);
+
+  if (!project) {
+    return { title: "Project not found" };
+  }
+
+  // The root layout adds the site name to `title`; Open Graph titles get no template
+  const title = `${project.name} case study`;
+  const [width, height] = project.imageSize ?? [1280, 680];
+
+  return {
+    title,
+    description: project.summary,
+    alternates: { canonical: `/work/${slug}` },
+    openGraph: {
+      title: `${title} | ${siteConfig.name}`,
+      description: project.summary,
+      url: `/work/${slug}`,
+      siteName: siteConfig.name,
+      locale: "en_US",
+      type: "article",
+      images: project.image
+        ? [
+            {
+              url: project.image,
+              width,
+              height,
+              alt: `Homepage of the ${project.name} website`,
+            },
+          ]
+        : undefined,
+    },
+  };
 }
 
 export default async function CaseStudyPage({ params }) {
@@ -18,103 +81,106 @@ export default async function CaseStudyPage({ params }) {
     notFound();
   }
 
-  // Find the next project for the footer link
+  // The projects run in a loop: after the last comes the first
   const currentIndex = projects.findIndex((p) => p.slug === slug);
   const nextProject = projects[(currentIndex + 1) % projects.length];
+
+  const results = project.results ?? [];
+  const gallery = project.gallery ?? [];
 
   return (
     <>
       <Navigation />
-      <main className="cs-main">
-        <div className="cs-bg-orb" aria-hidden="true" />
-        <header className="case-study-hero">
-          <MotionReveal>
-            <p className="cs-category">{project.category}</p>
-            <h1 className="cs-title">{project.name}</h1>
-            <p className="cs-summary">{project.summary}</p>
-          </MotionReveal>
-          
-          <MotionReveal delay={0.1}>
-            <div className="cs-meta glass-panel">
-              <div className="cs-meta-col">
-                <h4>Deliverables</h4>
-                <ul>
-                  {project.deliverables.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="cs-meta-col">
-                <h4>Outcome</h4>
-                <ul>
-                  <li>{project.outcome.replace("Outcome: ", "")}</li>
-                </ul>
-              </div>
-            </div>
-          </MotionReveal>
-        </header>
 
-        <section className="cs-content-wrapper" style={{ padding: "0 2rem", maxWidth: "1400px", margin: "0 auto" }}>
-          <MotionReveal delay={0.2}>
-            <div className="cs-hero-image-container">
-              {/* Replace with actual image later */}
-              {project.image ? (
-                <img
-                  src={project.image}
-                  alt={`${project.name} main showcase`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <span className="cs-placeholder-text">Hero Image Placeholder</span>
-              )}
-            </div>
+      <main className="case-page">
+        <CaseHero
+          name={project.name}
+          category={project.category}
+          summary={project.summary}
+          deliverables={project.deliverables}
+          image={project.image}
+          imageSize={project.imageSize}
+          tone={project.tone}
+        />
+
+        {/* The story: two parts, the second a step down and across from the first */}
+        <section className="case-story">
+          <div className="case-story-part">
+            <h2 className="case-heading">The challenge</h2>
+            <CaseInk text={project.challenge} />
+          </div>
+
+          <div className="case-story-part">
+            <h2 className="case-heading">The solution</h2>
+            <CaseInk text={project.solution} />
+          </div>
+        </section>
+
+        {results.length > 0 ? <CaseOutcome results={results} tone={project.tone} /> : null}
+
+        {/* Details: only for projects that have gallery images */}
+        {gallery.length > 0 ? (
+          <section className="case-details">
+            <h2 className="case-heading">Details</h2>
+
+            <ul className="case-details-set">
+              {gallery.map((shot, index) => {
+                const [width, height] = shot.size ?? [1280, 680];
+
+                return (
+                  <li className="case-details-item" key={shot.src + index}>
+                    <MotionReveal distance={40}>
+                      <div className="case-frame">
+                        <Image
+                          src={shot.src}
+                          alt={shot.alt ?? ""}
+                          width={width}
+                          height={height}
+                          unoptimized
+                          loading="lazy"
+                        />
+                      </div>
+                    </MotionReveal>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+
+        {/* Close */}
+        <section className="case-close">
+          <MotionReveal>
+            <h2 className="case-close-title">Planning something like this?</h2>
           </MotionReveal>
 
-          <MotionReveal>
-            <div className="cs-content-section">
-              <div className="cs-sticky-heading">
-                <h2 className="cs-content-heading">The Challenge</h2>
-              </div>
-              <p className="cs-content-body">{project.challenge}</p>
-            </div>
-          </MotionReveal>
-
-          <MotionReveal>
-            <div className="cs-content-section">
-              <div className="cs-sticky-heading">
-                <h2 className="cs-content-heading">The Solution</h2>
-              </div>
-              <p className="cs-content-body">{project.solution}</p>
-            </div>
-          </MotionReveal>
-
-          <MotionReveal>
-            <div className="cs-image-grid">
-              <div className="cs-image-box">
-                <span className="cs-placeholder-text">Feature Image</span>
-              </div>
-              <div className="cs-image-box">
-                <span className="cs-placeholder-text">Detail Shot</span>
-              </div>
-            </div>
-          </MotionReveal>
-          
-          <MotionReveal>
-            <div className="cs-hero-image-container">
-               <span className="cs-placeholder-text">Full Width Final Showcase</span>
-            </div>
+          <MotionReveal delay={0.08}>
+            <Link className="case-link" href="/#contact">
+              Get a quote
+              <span className="case-arrow" aria-hidden="true">
+                <span>→</span>
+                <span>→</span>
+              </span>
+            </Link>
           </MotionReveal>
         </section>
 
-        <MotionReveal>
-          <div className="cs-next-project">
-            <span className="cs-next-label">Next Project</span>
-            <a href={`/work/${nextProject.slug}`} className="cs-next-title">
-              {nextProject.name}
-            </a>
-          </div>
-        </MotionReveal>
+        {/* Next project */}
+        <nav className="case-next" aria-label="More work">
+          <CaseNext
+            slug={nextProject.slug}
+            name={nextProject.name}
+            image={nextProject.image}
+            imageSize={nextProject.imageSize}
+            tone={nextProject.tone}
+          />
+
+          <Link className="case-text-link" href="/#work">
+            All work
+          </Link>
+        </nav>
       </main>
+
       <Footer />
     </>
   );

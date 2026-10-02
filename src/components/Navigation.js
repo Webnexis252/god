@@ -49,7 +49,7 @@ export default function Navigation({ backHref }) {
     <header className={`nav ${scrolled ? "is-scrolled" : ""}`}>
       <div className="nav-inner">
         <Link href="/" className="nav-brand" aria-label="Go to homepage">
-          <img src="/logo.png" alt="Webnexis Logo" className="nav-brand-logo" />
+          <img src="/logo-wide.webp" alt="Webnexis Logo" className="nav-brand-logo" />
         </Link>
 
         <button
@@ -87,7 +87,7 @@ export default function Navigation({ backHref }) {
           </nav>
 
           <a href="/#contact" className="nav-cta" onClick={closeMenu}>
-            Get a Quote
+            Get a quote
           </a>
         </div>
       </div>

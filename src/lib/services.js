@@ -1,13 +1,25 @@
+// `tone`, `titleLines` and `titleWidths` are presentation only. A tone is the deep
+// colour field a service's own page opens on. `titleLines` is how the name breaks
+// when it is set very large, and `titleWidths` is each of those lines' width in em
+// in the display cut (measured in the browser), so the name can be sized to span
+// its plate. `inSentence` is the name as it reads mid-sentence. `lede` is the
+// opening line of the overview, set as a statement above it. `relatedWork` lists
+// slugs from projects.js, and only where the work really used the service.
 export const servicesData = [
   {
     slug: "ui-ux-design",
     number: "01",
     name: "UI / UX Design",
+    titleLines: ["UI / UX Design"],
+    titleWidths: [4.78],
+    inSentence: "UI/UX design",
+    tone: "#3b1f33",
     tagline: "Design that earns trust before a single word is read.",
     description:
       "User experience strategy, wireframes, flows, and interface design built to make products easier to use and easier to trust.",
+    lede: "Great UI/UX is invisible.",
     overview:
-      "Great UI/UX is invisible. It removes friction, guides decisions, and makes the product feel inevitable. We approach interface design not as decoration, but as a persuasion system — every layout decision, spacing choice, and interaction pattern is engineered to reduce cognitive load and move users toward the right outcome.",
+      "It removes friction, guides decisions, and makes the product feel inevitable. We approach interface design not as decoration, but as a persuasion system: every layout decision, spacing choice, and interaction pattern is engineered to reduce cognitive load and move users toward the right outcome.",
     whatWeDeliver: [
       {
         title: "UX Research & Strategy",
@@ -54,16 +66,22 @@ export const servicesData = [
       { value: "100%", label: "Figma handoff ready" },
     ],
     cta: "Start a UI/UX project",
+    relatedWork: ["divergent-classes", "cake-it-easy", "bound-and-beyond"],
   },
   {
     slug: "web-development",
     number: "02",
     name: "Web Development",
+    titleLines: ["Web Development"],
+    titleWidths: [6.32],
+    inSentence: "web development",
+    tone: "#0e3138",
     tagline: "Production-grade web systems that actually perform.",
     description:
       "Modern websites and web apps engineered for speed, responsiveness, maintainability, and a polished production-ready finish.",
+    lede: "Websites that hold up under real conditions.",
     overview:
-      "We build websites and web applications that hold up under real conditions — fast at cold load, resilient on mobile, correct in SEO, and maintainable for teams picking up the codebase after launch. Our stack is opinionated by quality standards, not trend cycles. We default to Next.js for production web work because of its rendering flexibility, but we'll meet the project where the right architecture is.",
+      "We build websites and web applications that are fast at cold load, resilient on mobile, correct in SEO, and maintainable for teams picking up the codebase after launch. Our stack is opinionated by quality standards, not trend cycles. We default to Next.js for production web work because of its rendering flexibility, but we'll meet the project where the right architecture is.",
     whatWeDeliver: [
       {
         title: "Next.js / React Applications",
@@ -110,16 +128,22 @@ export const servicesData = [
       { value: "0", label: "Third-party bloat policy" },
     ],
     cta: "Start a web project",
+    relatedWork: ["divergent-classes", "cake-it-easy", "bound-and-beyond"],
   },
   {
     slug: "android-app-development",
     number: "03",
     name: "Android App Development",
+    titleLines: ["Android App", "Development"],
+    titleWidths: [4.32, 4.61],
+    inSentence: "Android app development",
+    tone: "#17361f",
     tagline: "Android apps built for the full spectrum of real devices.",
     description:
       "Android applications designed and developed for real-world usability, clean performance, and dependable release quality.",
+    lede: "Quality on Android means understanding fragmentation.",
     overview:
-      "Android development at quality means understanding fragmentation — thousands of device configurations, varying screen densities, memory constraints across low-end to flagship. We build with Kotlin-first architecture, Material Design 3 principles, and a QA process that includes real device testing across form factors to make sure the app doesn't just pass the emulator.",
+      "Thousands of device configurations, varying screen densities, memory constraints across low-end to flagship. We build with Kotlin-first architecture, Material Design 3 principles, and a QA process that includes real device testing across form factors to make sure the app doesn't just pass the emulator.",
     whatWeDeliver: [
       {
         title: "Native Kotlin Development",
@@ -171,11 +195,16 @@ export const servicesData = [
     slug: "ios-app-development",
     number: "04",
     name: "iOS App Development",
+    titleLines: ["iOS App", "Development"],
+    titleWidths: [2.67, 4.61],
+    inSentence: "iOS app development",
+    tone: "#27324a",
     tagline: "iPhone and iPad apps that feel exactly like they should.",
     description:
       "Native-feeling iPhone and iPad experiences with careful interface detail, smooth flows, and launch-focused implementation.",
+    lede: "iOS users have a calibrated sense of quality.",
     overview:
-      "iOS users have a calibrated sense of quality. Transitions feel wrong if they're 10ms off. Scrolling feels heavy if momentum isn't tuned. We build iOS applications with SwiftUI-first development, Human Interface Guidelines adherence, and careful attention to the small details that separate apps users trust from apps they delete. Every project goes through TestFlight before the App Store.",
+      "Transitions feel wrong if they're 10ms off. Scrolling feels heavy if momentum isn't tuned. We build iOS applications with SwiftUI-first development, Human Interface Guidelines adherence, and careful attention to the small details that separate apps users trust from apps they delete. Every project goes through TestFlight before the App Store.",
     whatWeDeliver: [
       {
         title: "SwiftUI Development",
@@ -227,16 +256,21 @@ export const servicesData = [
     slug: "debugging-management",
     number: "05",
     name: "Debugging / Management",
+    titleLines: ["Debugging /", "Management"],
+    titleWidths: [4.17, 4.63],
+    inSentence: "debugging and management",
+    tone: "#4a1a1a",
     tagline: "Technical clarity when things stop making sense.",
     description:
       "Bug fixing, technical troubleshooting, workflow cleanup, and project coordination to keep delivery moving without chaos.",
+    lede: "Messy codebases, broken pipelines, stalled projects. We have seen all of it.",
     overview:
-      "Messy codebases, broken pipelines, stalled projects, and teams shipping without structure — we've seen all of it and we know what to do. Whether you need a senior pair of eyes on a persistent bug, a technical audit before a handoff, or someone to own project coordination between design, dev, and stakeholders, we step in where the work needs steadiness and precision.",
+      "Teams shipping without structure, too. We know what to do. Whether you need a senior pair of eyes on a persistent bug, a technical audit before a handoff, or someone to own project coordination between design, dev, and stakeholders, we step in where the work needs steadiness and precision.",
     whatWeDeliver: [
       {
         title: "Bug Investigation & Fixing",
         detail:
-          "Systematic reproduction, root cause analysis, and a fix that addresses the cause — not just the symptom.",
+          "Systematic reproduction, root cause analysis, and a fix that addresses the cause, not just the symptom.",
       },
       {
         title: "Performance Debugging",
@@ -282,11 +316,16 @@ export const servicesData = [
     slug: "seo",
     number: "06",
     name: "SEO",
+    titleLines: ["SEO"],
+    titleWidths: [1.28],
+    inSentence: "SEO",
+    tone: "#38360f",
     tagline: "Search performance built into the structure, not bolted on after.",
     description:
       "Search optimisation across structure, performance, metadata, content direction, and discoverability so good work gets found.",
+    lede: "SEO is not keyword stuffing, and it is not gaming algorithms.",
     overview:
-      "SEO is not keyword stuffing and it is not gaming algorithms. It is making sure your site is technically clean, structurally sound, content-relevant, and fast enough to rank. We build SEO into the architecture from the start — proper semantic HTML, metadata systems, schema markup, Core Web Vitals, and a content strategy that builds domain authority over time rather than chasing short-term spikes.",
+      "It is making sure your site is technically clean, structurally sound, content-relevant, and fast enough to rank. We build SEO into the architecture from the start: proper semantic HTML, metadata systems, schema markup, Core Web Vitals, and a content strategy that builds domain authority over time rather than chasing short-term spikes.",
     whatWeDeliver: [
       {
         title: "Technical SEO Audit",
@@ -306,7 +345,7 @@ export const servicesData = [
       {
         title: "Performance for SEO",
         detail:
-          "LCP, INP, CLS resolution — Core Web Vitals improvements directly tied to ranking signal improvement.",
+          "LCP, INP, CLS resolution: Core Web Vitals improvements directly tied to ranking signal improvement.",
       },
       {
         title: "Content Strategy",
@@ -321,7 +360,7 @@ export const servicesData = [
     ],
     process: [
       { step: "Audit", detail: "Full technical audit, competitor gap analysis, and keyword opportunity mapping." },
-      { step: "Prioritisation", detail: "Issue triage by impact and effort — quick wins first, structural fixes planned." },
+      { step: "Prioritisation", detail: "Issue triage by impact and effort: quick wins first, structural fixes planned." },
       { step: "Technical Fixes", detail: "In-codebase SEO implementation: metadata, schema, sitemaps, robots, redirects." },
       { step: "Content Alignment", detail: "On-page optimisation and content brief delivery for the editorial team." },
       { step: "Monitoring", detail: "GSC tracking, rank monitoring, Core Web Vitals review, monthly reporting." },
@@ -332,16 +371,22 @@ export const servicesData = [
       { value: "GSC", label: "Verified and monitored" },
     ],
     cta: "Start an SEO project",
+    relatedWork: ["cake-it-easy"],
   },
   {
     slug: "branding",
     number: "07",
     name: "Branding",
+    titleLines: ["Branding"],
+    titleWidths: [3.17],
+    inSentence: "branding",
+    tone: "#1d1f52",
     tagline: "A brand that people remember without being told to.",
     description:
       "Brand direction, visual identity systems, and positioning work that gives the business a clearer and more memorable presence.",
+    lede: "Branding is what happens when design meets intention.",
     overview:
-      "Branding is what happens when design meets intention. A strong brand isn't just a logo — it's a system of decisions about how the business looks, sounds, and behaves across every touchpoint. We work from the inside out: clarify the positioning, define the personality, then build the visual system that expresses it consistently across digital and physical contexts.",
+      "A strong brand isn't just a logo. It's a system of decisions about how the business looks, sounds, and behaves across every touchpoint. We work from the inside out: clarify the positioning, define the personality, then build the visual system that expresses it consistently across digital and physical contexts.",
     whatWeDeliver: [
       {
         title: "Brand Strategy & Positioning",
@@ -377,7 +422,7 @@ export const servicesData = [
     process: [
       { step: "Discovery", detail: "Brand audit, stakeholder interviews, competitor landscape, and positioning workshop." },
       { step: "Strategy", detail: "Value proposition, brand personality, tone of voice, and positioning statement." },
-      { step: "Concept Development", detail: "2–3 distinct visual directions with rationale and moodboards." },
+      { step: "Concept Development", detail: "2-3 distinct visual directions with rationale and moodboards." },
       { step: "Refinement", detail: "Selected direction developed to completion across all identity elements." },
       { step: "System Build", detail: "Figma design system, brand guidelines document, and asset export package." },
       { step: "Handoff", detail: "All source files, fonts, brand guidelines PDF, and implementation support." },
@@ -393,11 +438,16 @@ export const servicesData = [
     slug: "social-media-marketing",
     number: "08",
     name: "Social Media Marketing",
+    titleLines: ["Social Media", "Marketing"],
+    titleWidths: [4.46, 3.62],
+    inSentence: "social media marketing",
+    tone: "#4a2710",
     tagline: "Content that builds attention, not just impressions.",
     description:
       "Content support, campaign thinking, and social media execution built to strengthen reach, consistency, and audience engagement.",
+    lede: "Social media marketing done badly is just noise.",
     overview:
-      "Social media marketing done badly is just noise. Done well, it builds compounding awareness, earns trust through consistency, and gives the sales team warm leads instead of cold calls. We approach social not as a content factory but as a strategic communication layer — understanding what your audience actually responds to, what posting patterns work on each platform, and how to measure what matters beyond vanity metrics.",
+      "Done well, it builds compounding awareness, earns trust through consistency, and gives the sales team warm leads instead of cold calls. We approach social not as a content factory but as a strategic communication layer: understanding what your audience actually responds to, what posting patterns work on each platform, and how to measure what matters beyond vanity metrics.",
     whatWeDeliver: [
       {
         title: "Social Media Strategy",
@@ -448,4 +498,20 @@ export const servicesData = [
 
 export function getServiceBySlug(slug) {
   return servicesData.find((s) => s.slug === slug) || null;
+}
+
+// A word space in the display cut, in em.
+const TITLE_SPACE = 0.165;
+
+// What a service's name is sized against: its widest line when it is broken as in
+// `titleLines`, and the whole name when it is set on a single line. Both in em.
+export function getTitleFit(service) {
+  const widths = service.titleWidths;
+
+  return {
+    stacked: Math.max(...widths),
+    single:
+      widths.reduce((total, width) => total + width, 0) +
+      TITLE_SPACE * (widths.length - 1),
+  };
 }

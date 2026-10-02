@@ -1,88 +1,37 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-import { useRef } from "react";
 import SplineContainer from "@/components/SplineContainer";
-import useHydrated from "@/components/useHydrated";
 
+// The copy's entrance is a CSS transition keyed off the preloader (see
+// html[data-entrance] in globals.css), so it stays smooth while the scene boots.
 export default function HeroSection() {
-  const isHydrated = useHydrated();
-  const prefersReducedMotion = useReducedMotion();
-  const heroRef = useRef(null);
-  const CopyWrapper = isHydrated ? motion.div : "div";
-  const AsideWrapper = isHydrated ? motion.div : "div";
-
   return (
-    <section
-      ref={heroRef}
-      className="hero-section"
-      data-section="hero"
-      id="hero"
-    >
+    <section className="hero-section" data-section="hero" id="hero">
       <div className="hero-scene" aria-hidden="true">
         <SplineContainer
-          interactionScopeRef={heroRef}
           sceneUrl="/spline/webnexis-hero.scene.splinecode"
+          posterUrl="/spline/webnexis-hero-poster.webp"
+          coverSelector=".hero-shell"
         />
       </div>
 
-      <div className="hero-backdrop" aria-hidden="true" />
-
-      <div className="hero-orb hero-orb-left" aria-hidden="true" />
-      <div className="hero-orb hero-orb-right" aria-hidden="true" />
-
       <div className="hero-shell">
-        <CopyWrapper
-          className="hero-copy"
-          {...(isHydrated
-            ? {
-                initial: prefersReducedMotion ? false : { opacity: 0, y: 42 },
-                animate: prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 },
-                transition: { duration: 0.85, delay: 1.6, ease: [0.16, 1, 0.3, 1] },
-              }
-            : {})}
-        >
-          <p className="hero-kicker">Webnexis / Premium Digital Agency</p>
-          <h1 className="hero-title">
-            Highly technical interfaces and robust digital ecosystems.
-          </h1>
+        <h1 className="hero-title">
+          All eyes on <span>your website.</span>
+        </h1>
+
+        <div className="hero-foot">
           <p className="hero-description">
-            Webnexis designs and develops advanced AI integrations, corporate web platforms, mobile applications (iOS & Android), and strategic e-commerce systems engineered for performance and scalability.
+            We design and build websites, apps and AI tools for startups, online stores and local businesses.
           </p>
 
           <div className="hero-actions">
             <a className="primary-button" href="#contact">
-              Request a quote
+              Get a quote
             </a>
             <a className="secondary-button" href="#work">
-              View selected work
+              See our work
             </a>
           </div>
-        </CopyWrapper>
-
-        <AsideWrapper
-          className="hero-aside"
-          {...(isHydrated
-            ? {
-                initial: prefersReducedMotion ? false : { opacity: 0, y: 30 },
-                animate: prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 },
-                transition: {
-                  duration: 0.8,
-                  delay: 1.68,
-                  ease: [0.16, 1, 0.3, 1],
-                },
-              }
-            : {})}
-        >
-          <p className="hero-aside-copy">
-            We partner with tech startups, e-commerce brands, and ambitious local businesses to architect high-end projects requiring a precise balance of deep technical execution, artistic design, and corporate professionalism.
-          </p>
-          <div className="hero-aside-list" aria-label="Studio capabilities">
-            <span>UI / UX Design</span>
-            <span>Mobile & Web Dev</span>
-            <span>AI Integrations</span>
-          </div>
-        </AsideWrapper>
+        </div>
       </div>
     </section>
   );

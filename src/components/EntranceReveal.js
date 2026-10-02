@@ -1,125 +1,150 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { subscribeToScene } from "@/lib/sceneSignal";
+
+const MIN_VISIBLE_MS = 1000;
+// Past this the page opens anyway and the scene fades in over its poster.
+const MAX_WAIT_MS = 6000;
+const EXIT_MS = 1000;
 
 export default function EntranceReveal() {
-  const [isVisible, setIsVisible] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState("loading"); // "loading" | "split" | "done"
-  const prefersReducedMotion = useReducedMotion();
+  const [isDone, setIsDone] = useState(false);
+  const overlayRef = useRef(null);
+  const fillRef = useRef(null);
+  const countRef = useRef(null);
+  const statusRef = useRef(null);
 
   useEffect(() => {
-    // Lock scroll while overlay is active
-    document.body.style.overflow = "hidden";
+    const root = document.documentElement;
+    const overlay = overlayRef.current;
+    const fill = fillRef.current;
+    const count = countRef.current;
+    const status = statusRef.current;
 
-    if (prefersReducedMotion) {
-      document.body.style.overflow = "";
-      setIsVisible(false);
-      return;
+    if (!overlay || !fill || !count || !status) {
+      return undefined;
     }
 
-    // Fake progress counter (0 to 100 over ~1.2s)
-    let startTime = null;
-    const duration = 1200;
-    
-    const animateProgress = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const rawProgress = Math.min((elapsed / duration) * 100, 100);
-      
-      // Easing function for progress (easeOutExpo-ish)
-      const easedProgress = rawProgress === 100 ? 100 : 100 * (1 - Math.pow(2, -10 * (rawProgress / 100)));
-      
-      setProgress(Math.round(easedProgress));
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const waitsForScene = Boolean(document.querySelector(".spline-stage"));
+    let scene = { progress: 0, settled: !waitsForScene };
+    const unsubscribe = waitsForScene
+      ? subscribeToScene((next) => {
+          scene = next;
+        })
+      : () => {};
 
-      if (elapsed < duration) {
-        requestAnimationFrame(animateProgress);
-      } else {
-        // Trigger the split reveal
-        setTimeout(() => setPhase("split"), 100);
-        
-        // Remove from DOM eventually
-        setTimeout(() => {
-          setPhase("done");
-          document.body.style.overflow = "";
-          setIsVisible(false);
-        }, 1200); // 1.2s for split animation to finish
-      }
+    const startedAt = performance.now();
+    let shown = 0;
+    let shownCount = -1;
+    let shownStatus = "";
+    let frameId = 0;
+    let exitTimer = 0;
+
+    // Locks scroll and holds the hero copy back until the panels part.
+    root.dataset.entrance = "loading";
+
+    const exit = () => {
+      overlay.dataset.phase = "exit";
+      root.dataset.entrance = "done";
+      exitTimer = window.setTimeout(
+        () => setIsDone(true),
+        prefersReducedMotion ? 0 : EXIT_MS
+      );
     };
 
-    requestAnimationFrame(animateProgress);
+    // Written straight to the DOM: re-rendering every frame would compete with
+    // the scene for the main thread.
+    const tick = (now) => {
+      const elapsed = now - startedAt;
+      const isReady =
+        elapsed >= MIN_VISIBLE_MS && (scene.settled || elapsed >= MAX_WAIT_MS);
+      const creep = 1 - Math.exp(-elapsed / 1200);
+      const target = isReady
+        ? 1
+        : waitsForScene
+          ? 0.22 * creep + 0.72 * scene.progress
+          : 0.94 * creep;
+
+      shown += (target - shown) * (isReady ? 0.2 : 0.08);
+
+      const isComplete = isReady && shown > 0.995;
+      const nextCount = isComplete ? 100 : Math.round(shown * 100);
+      const nextStatus = isComplete
+        ? "Ready"
+        : !waitsForScene || scene.settled
+          ? "Loading"
+          : scene.progress < 0.7
+            ? "Loading assets"
+            : "Building 3D scene";
+
+      fill.style.transform = `scaleX(${isComplete ? 1 : shown})`;
+
+      if (nextCount !== shownCount) {
+        shownCount = nextCount;
+        count.textContent = String(nextCount).padStart(2, "0");
+      }
+
+      if (nextStatus !== shownStatus) {
+        shownStatus = nextStatus;
+        status.textContent = nextStatus;
+      }
+
+      if (isComplete) {
+        exit();
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    frameId = window.requestAnimationFrame(tick);
 
     return () => {
-      document.body.style.overflow = "";
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(exitTimer);
+      unsubscribe();
+      delete root.dataset.entrance;
     };
-  }, [prefersReducedMotion]);
+  }, []);
 
-  if (!isVisible) return null;
+  if (isDone) {
+    return null;
+  }
 
   return (
-    <AnimatePresence>
-      <div className="entrance-overlay-spectacular" aria-hidden="true" role="presentation">
-        
-        {/* Top Half Panel */}
-        <motion.div
-          className="entrance-panel entrance-panel-top"
-          initial={{ y: "0%" }}
-          animate={phase === "split" ? { y: "-100%" } : { y: "0%" }}
-          transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
-        >
-          <div className="entrance-grid" />
-          <div className="entrance-glow entrance-glow-top" />
-        </motion.div>
-
-        {/* Bottom Half Panel */}
-        <motion.div
-          className="entrance-panel entrance-panel-bottom"
-          initial={{ y: "0%" }}
-          animate={phase === "split" ? { y: "100%" } : { y: "0%" }}
-          transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
-        >
-          <div className="entrance-grid entrance-grid-bottom" />
-          <div className="entrance-glow entrance-glow-bottom" />
-        </motion.div>
-
-        {/* Center Content (Logo & Progress) */}
-        <motion.div
-          className="entrance-center-content"
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={
-            phase === "split"
-              ? { opacity: 0, scale: 1.1 }
-              : { opacity: 1, scale: 1 }
-          }
-          transition={
-            phase === "split"
-              ? { duration: 0.5, ease: [0.4, 0, 1, 1] }
-              : { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-          }
-        >
-          <img
-            src="/logo.png"
-            alt="Webnexis"
-            className="entrance-logo"
-            draggable={false}
-          />
-          
-          <div className="entrance-loading-wrapper">
-            <span className="entrance-progress-text">{progress}%</span>
-            <div className="entrance-progress-track">
-              <motion.div 
-                className="entrance-progress-bar"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <span className="entrance-status-text">
-              {progress === 100 ? "READY" : "LOADING"}
-            </span>
-          </div>
-        </motion.div>
-
+    <div ref={overlayRef} className="entrance" aria-hidden="true">
+      <div className="entrance-panel entrance-panel-top">
+        <div className="entrance-grid" />
+        <div className="entrance-glow" />
+        <img
+          src="/logo-wide.webp"
+          alt=""
+          className="entrance-logo"
+          draggable={false}
+        />
       </div>
-    </AnimatePresence>
+
+      <div className="entrance-panel entrance-panel-bottom">
+        <div className="entrance-grid" />
+        <div className="entrance-glow" />
+        <div className="entrance-meter">
+          <span ref={statusRef} className="entrance-status">
+            Loading
+          </span>
+          <span className="entrance-count">
+            <span ref={countRef}>00</span>%
+          </span>
+        </div>
+      </div>
+
+      <div className="entrance-seam">
+        <span ref={fillRef} className="entrance-seam-fill" />
+        <span className="entrance-seam-glint" />
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,19 @@
+import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
 import EntranceReveal from "@/components/EntranceReveal";
+
+// The width and optical-size axes let the hero headline run condensed at display size.
+const displayFont = Bricolage_Grotesque({
+  subsets: ["latin"],
+  axes: ["opsz", "wdth"],
+  variable: "--font-bricolage",
+});
+
+const bodyFont = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-hanken",
+});
 
 export const metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -80,8 +93,15 @@ const structuredData = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" dir="ltr">
+    <html
+      lang="en"
+      dir="ltr"
+      className={`${displayFont.variable} ${bodyFont.variable}`}
+    >
       <body>
+        <noscript>
+          <style>{".entrance{display:none}"}</style>
+        </noscript>
         <EntranceReveal />
         {children}
         <script

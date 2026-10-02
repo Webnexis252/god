@@ -3,13 +3,14 @@ import Marquee from "@/components/Marquee";
 import ContactForm from "@/components/ContactForm";
 import HeroSection from "@/components/HeroSection";
 import MotionReveal from "@/components/MotionReveal";
-import ParallaxBlock from "@/components/ParallaxBlock";
-import ProjectRail from "@/components/ProjectRail";
 import ServicesList from "@/components/ServicesList";
 import { siteConfig } from "@/lib/site";
 import { servicesData } from "@/lib/services";
 import { projects } from "@/lib/projects";
 import Footer from "@/components/Footer";
+import StickyQuote from "@/components/StickyQuote";
+import WorkStack from "@/components/WorkStack";
+import ProcessLine from "@/components/ProcessLine";
 
 
 
@@ -38,14 +39,10 @@ const processSteps = [
 ];
 
 export default function Home() {
-  const [featuredProject, ...otherProjects] = projects;
-
   return (
     <>
       <Navigation />
-      <a className="sticky-quote-cta" href="#contact">
-        Get a Quote
-      </a>
+      <StickyQuote />
 
       <main>
         <HeroSection />
@@ -55,12 +52,11 @@ export default function Home() {
           <MotionReveal className="section-heading">
             <div>
               <p className="section-eyebrow">What We Do</p>
-              <h2 className="section-title">Digital product, growth, and brand services.</h2>
+              <h2 className="section-title">Design&nbsp;it. Build&nbsp;it. Get&nbsp;it&nbsp;found.</h2>
             </div>
             <p className="section-copy">
-              From UI / UX and development to branding, SEO, and social media
-              marketing, every service is aimed at helping the business ship
-              better and grow with more clarity.
+              One team covers design, development and growth, so nothing gets
+              lost in handoffs. Pick a service to see exactly what&apos;s included.
             </p>
           </MotionReveal>
 
@@ -73,72 +69,15 @@ export default function Home() {
           <MotionReveal className="section-heading">
             <div>
               <p className="section-eyebrow">Selected Work</p>
-              <h2 className="section-title">Case studies built with intention.</h2>
+              <h2 className="section-title">Built for a&nbsp;classroom, a&nbsp;bakery and a&nbsp;library.</h2>
             </div>
             <p className="section-copy">
-              A showcase of recent work focused on strong narrative, clean motion, and conversion-ready interfaces. (Upload your images to public/ to view them here).
+              Three recent builds, each shaped around how the business actually
+              runs. Open any one for the full case study.
             </p>
           </MotionReveal>
 
-          <div className="projects-feature">
-            <ParallaxBlock
-              className="project-media project-media-feature"
-              aria-hidden="true"
-              offset={84}
-              mobileOffset={18}
-              scaleRange={[0.94, 1, 1.03]}
-            >
-              {featuredProject.image && (
-                <img src={featuredProject.image} alt={featuredProject.name} className="project-feature-img" />
-              )}
-              <div className="project-media-overlay">
-                <span className="project-media-label">Featured Project</span>
-                <span className="project-media-name">{featuredProject.name}</span>
-                <span className="project-media-type">{featuredProject.category}</span>
-              </div>
-            </ParallaxBlock>
-
-            <MotionReveal className="project-body project-body-feature" delay={0.08}>
-              <div className="project-heading">
-                <p className="project-category">{featuredProject.category}</p>
-                <h3 className="project-name">{featuredProject.name}</h3>
-              </div>
-
-              <p className="project-summary">{featuredProject.summary}</p>
-
-              <ul
-                className="project-deliverables"
-                aria-label={`${featuredProject.name} deliverables`}
-              >
-                {featuredProject.deliverables.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-
-              <p className="project-outcome">{featuredProject.outcome}</p>
-
-              <div className="project-actions">
-                <a className="text-link" href={`/work/${featuredProject.slug}`}>
-                  View case study outline
-                </a>
-                <a className="text-link" href="#contact">
-                  Build something similar
-                </a>
-              </div>
-            </MotionReveal>
-          </div>
-
-          <div className="projects-list">
-            {otherProjects.map((project, index) => (
-              <MotionReveal
-                key={project.name}
-                delay={0.06 * index}
-                distance={44}
-              >
-                <ProjectRail project={project} />
-              </MotionReveal>
-            ))}
-          </div>
+          <WorkStack projects={projects} />
         </section>
 
 
@@ -154,20 +93,7 @@ export default function Home() {
             </p>
           </MotionReveal>
 
-          <div className="process-list">
-            {processSteps.map((step, index) => (
-              <MotionReveal
-                key={step.step}
-                className="process-row"
-                delay={0.05 * index}
-                distance={42}
-              >
-                <p className="process-index">0{index + 1}</p>
-                <h3 className="process-title">{step.step}</h3>
-                <p className="process-detail">{step.detail}</p>
-              </MotionReveal>
-            ))}
-          </div>
+          <ProcessLine steps={processSteps} />
         </section>
 
         <section className="contact-section" data-section="contact" id="contact">
