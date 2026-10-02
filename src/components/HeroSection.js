@@ -1,7 +1,5 @@
 import SplineContainer from "@/components/SplineContainer";
 
-// The copy's entrance is a CSS transition keyed off the preloader (see
-// html[data-entrance] in globals.css), so it stays smooth while the scene boots.
 export default function HeroSection() {
   return (
     <section className="hero-section" data-section="hero" id="hero">
@@ -9,6 +7,7 @@ export default function HeroSection() {
         <SplineContainer
           sceneUrl="/spline/webnexis-hero.scene.splinecode"
           posterUrl="/spline/webnexis-hero-poster.webp"
+          posterUrl2x="/spline/webnexis-hero-poster-2x.webp"
           coverSelector=".hero-shell"
         />
       </div>

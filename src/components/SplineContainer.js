@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { reportSceneProgress, reportSceneSettled } from "@/lib/sceneSignal";
 
 // Self-hosted copies of the decoders the runtime otherwise pulls from unpkg and gstatic.
 const WASM_PATH = "/spline/wasm";
@@ -22,6 +21,9 @@ const MIN_PIXEL_RATIO = 0.6;
 const FULL_FRAME_MS = 1000 / 60;
 const HALF_FRAME_MS = 1000 / 30;
 const QUALITY_WINDOW_MS = 500;
+// Frames are slow just after the reveal because the rest of the page is still
+// starting up, so nothing is judged until that has passed.
+const QUALITY_GRACE_MS = 2500;
 const FIRST_FRAME_TIMEOUT_MS = 1500;
 const SCROLL_RESUME_MS = 140;
 const RESIZE_SETTLE_MS = 120;
@@ -91,6 +93,8 @@ function fitFrame(stage, frame, cover) {
   frame.style.transform = `translate(${-scale * (viewLeft + halfWidth)}px, ${
     -scale * (viewTop + halfHeight)
   }px) scale(${scale})`;
+  // The poster is held back until this is set, so it never paints at the wrong size.
+  frame.dataset.fitted = "true";
 }
 
 function isConstrainedDevice() {
@@ -124,9 +128,11 @@ function canRenderScene() {
 
 // The scene is published at the full device pixel ratio, which is millions of
 // wasted pixels on phones and 4K monitors. Cap it by ratio and by total pixels.
+// The desktop budget keeps a retina laptop near 1.65x, where the crowd still looks
+// crisp; a device that cannot hold it is stepped down by bindQuality.
 function pickPixelRatio(width, height, constrained) {
-  const cap = constrained ? 1.5 : 1.75;
-  const budget = constrained ? 0.9e6 : 2.8e6;
+  const cap = constrained ? 1.5 : 2;
+  const budget = constrained ? 0.9e6 : 4.2e6;
   const withinBudget = Math.sqrt(budget / Math.max(width * height, 1));
 
   return clamp(
@@ -136,45 +142,14 @@ function pickPixelRatio(width, height, constrained) {
   );
 }
 
-async function fetchScene(url, signal, onProgress) {
+async function fetchScene(url, signal) {
   const response = await fetch(url, { signal });
 
   if (!response.ok) {
     throw new Error(`Scene request failed with ${response.status}`);
   }
 
-  const total = Number(response.headers.get("content-length"));
-
-  // Content-Length counts compressed bytes, so it can only measure an uncompressed response.
-  if (!response.body || !total || response.headers.get("content-encoding")) {
-    return response.arrayBuffer();
-  }
-
-  const reader = response.body.getReader();
-  const chunks = [];
-  let received = 0;
-
-  for (;;) {
-    const { done, value } = await reader.read();
-
-    if (done) {
-      break;
-    }
-
-    chunks.push(value);
-    received += value.length;
-    onProgress(Math.min(received / total, 1));
-  }
-
-  const bytes = new Uint8Array(received);
-  let offset = 0;
-
-  chunks.forEach((chunk) => {
-    bytes.set(chunk, offset);
-    offset += chunk.length;
-  });
-
-  return bytes.buffer;
+  return response.arrayBuffer();
 }
 
 function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
@@ -232,7 +207,6 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
   const showPoster = () => {
     if (!isDisposed) {
       onLiveChange(false);
-      reportSceneSettled();
     }
   };
 
@@ -282,6 +256,12 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
       };
     }
 
+    const redraw = () => {
+      if (!isDisposed && typeof render === "function") {
+        render(performance.now());
+      }
+    };
+
     const syncSize = () => {
       const nextWidth = canvas.clientWidth;
       const nextHeight = canvas.clientHeight;
@@ -315,6 +295,12 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
       }
 
       app.setSize(width, height);
+
+      // Resizing clears the canvas. Draw again before the frame is shown, so the
+      // cleared canvas never reaches the screen. Queued, not called: this can run
+      // inside the runtime's own render (bindQuality steps down from its "rendered"
+      // event), and that has to finish first.
+      queueMicrotask(redraw);
     };
 
     // Every resize reallocates the render targets, so wait for a drag to settle.
@@ -497,7 +483,7 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
     let samples = [];
     let slowWindows = 0;
     let lastRenderAt = 0;
-    let windowStart = performance.now() + QUALITY_WINDOW_MS;
+    let windowStart = performance.now() + QUALITY_GRACE_MS;
 
     const handleRendered = () => {
       const now = performance.now();
@@ -549,16 +535,13 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
   const load = async () => {
     const [{ Application }, buffer] = await Promise.all([
       import("@splinetool/runtime"),
-      fetchScene(sceneUrl, controller.signal, (fraction) => {
-        reportSceneProgress(fraction * 0.7);
-      }),
+      fetchScene(sceneUrl, controller.signal),
     ]);
 
     if (isDisposed) {
       return;
     }
 
-    reportSceneProgress(0.8);
     app = new Application(canvas, { wasmPath: WASM_PATH });
 
     const quality = bindScene();
@@ -590,7 +573,6 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
     bindQuality(quality);
     bindContextLoss();
     onLiveChange(true);
-    reportSceneSettled();
   };
 
   load().catch(showPoster);
@@ -605,9 +587,11 @@ function mountScene({ canvas, stage, sceneUrl, onLiveChange }) {
 
 // coverSelector: the element laid over the bottom of the scene, which the crowd's
 // upper rows are kept clear of.
+// posterUrl2x: the same still at twice the size, for high-density screens.
 export default function SplineContainer({
   sceneUrl,
   posterUrl,
+  posterUrl2x,
   coverSelector,
   className = "",
 }) {
@@ -651,7 +635,6 @@ export default function SplineContainer({
     }
 
     if (!canRenderScene()) {
-      reportSceneSettled();
       return undefined;
     }
 
@@ -673,7 +656,14 @@ export default function SplineContainer({
     >
       <div ref={frameRef} className="spline-frame">
         {posterUrl ? (
-          <img className="spline-poster" src={posterUrl} alt="" decoding="async" />
+          <img
+            className="spline-poster"
+            src={posterUrl}
+            srcSet={posterUrl2x ? `${posterUrl} 1x, ${posterUrl2x} 2x` : undefined}
+            alt=""
+            decoding="async"
+            fetchPriority="high"
+          />
         ) : null}
 
         <canvas ref={canvasRef} className="spline-canvas" />

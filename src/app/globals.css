@@ -114,193 +114,6 @@ ol {
   outline-offset: 3px;
 }
 
-/* ─────────────────────────────────────────
-   Entrance preloader
-   Everything that moves here is a transform or opacity animation, so it keeps
-   running on the compositor while the 3D scene occupies the main thread.
-───────────────────────────────────────── */
-
-html[data-entrance="loading"] body {
-  overflow: hidden;
-}
-
-.entrance {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  /* If scripts never run, step aside instead of covering the page forever. */
-  animation: entrance-failsafe 1ms linear 12s forwards;
-}
-
-.entrance[data-phase="exit"] {
-  pointer-events: none;
-}
-
-@keyframes entrance-failsafe {
-  to { visibility: hidden; }
-}
-
-.entrance-panel {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  background: #07090d;
-  overflow: hidden;
-  will-change: transform;
-  transition: transform 900ms cubic-bezier(0.76, 0, 0.24, 1) 120ms;
-}
-
-.entrance-panel-top {
-  top: 0;
-  bottom: 50%;
-  align-items: flex-end;
-  padding-bottom: 1.9rem;
-}
-
-.entrance-panel-bottom {
-  top: 50%;
-  bottom: 0;
-  align-items: flex-start;
-  padding-top: 1.4rem;
-}
-
-.entrance[data-phase="exit"] .entrance-panel-top {
-  transform: translateY(-100%);
-}
-
-.entrance[data-phase="exit"] .entrance-panel-bottom {
-  transform: translateY(100%);
-}
-
-/* Both panels carry the same viewport-sized backdrop, so it reads as one image until they part. */
-.entrance-glow,
-.entrance-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 200%;
-  pointer-events: none;
-}
-
-.entrance-panel-bottom .entrance-glow,
-.entrance-panel-bottom .entrance-grid {
-  top: -100%;
-}
-
-.entrance-glow {
-  background:
-    radial-gradient(ellipse 60% 44% at 50% 50%, rgba(227, 183, 107, 0.18), transparent 70%),
-    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(88, 111, 157, 0.12), transparent 60%);
-  animation: entrance-glow-pulse 2s ease-in-out infinite alternate;
-}
-
-@keyframes entrance-glow-pulse {
-  from { opacity: 0.7; }
-  to   { opacity: 1; }
-}
-
-.entrance-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 5rem 5rem;
-  mask-image: radial-gradient(ellipse 70% 60% at center, rgba(0, 0, 0, 0.6), transparent 80%);
-}
-
-.entrance-logo,
-.entrance-meter {
-  position: relative;
-  animation: entrance-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  transition: opacity 360ms ease;
-}
-
-.entrance[data-phase="exit"] .entrance-logo,
-.entrance[data-phase="exit"] .entrance-meter {
-  opacity: 0;
-}
-
-@keyframes entrance-rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.7rem);
-  }
-}
-
-.entrance-logo {
-  width: clamp(11rem, 34vw, 16rem);
-  aspect-ratio: 8 / 3;
-  object-fit: contain;
-  user-select: none;
-}
-
-.entrance-meter {
-  width: min(18rem, 72vw);
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  animation-delay: 90ms;
-}
-
-.entrance-status {
-  color: var(--text-dim);
-}
-
-.entrance-count {
-  color: var(--accent-strong);
-  font-variant-numeric: tabular-nums;
-}
-
-/* The progress bar is the seam the page opens along. */
-.entrance-seam {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  margin-top: -1px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  transition: opacity 280ms ease;
-}
-
-.entrance[data-phase="exit"] .entrance-seam {
-  opacity: 0;
-}
-
-.entrance-seam-fill,
-.entrance-seam-glint {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-}
-
-.entrance-seam-fill {
-  width: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-.entrance-seam-glint {
-  width: 20%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
-  animation: entrance-glint 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-@keyframes entrance-glint {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(500%); }
-}
-
 main {
   display: flex;
   flex-direction: column;
@@ -751,31 +564,6 @@ section[id] {
   }
 }
 
-/* Entrance: held back while the preloader is up, then staggered in as its panels part. */
-.hero-title,
-.hero-description,
-.hero-actions {
-  transition:
-    opacity 850ms cubic-bezier(0.16, 1, 0.3, 1) var(--enter-delay, 300ms),
-    transform 850ms cubic-bezier(0.16, 1, 0.3, 1) var(--enter-delay, 300ms);
-}
-
-.hero-description {
-  --enter-delay: 400ms;
-}
-
-.hero-actions {
-  --enter-delay: 480ms;
-}
-
-html[data-entrance="loading"] .hero-title,
-html[data-entrance="loading"] .hero-description,
-html[data-entrance="loading"] .hero-actions {
-  opacity: 0;
-  transform: translateY(2.2rem);
-  transition: none;
-}
-
 .trust-pill {
   display: inline-flex;
   align-items: center;
@@ -795,9 +583,11 @@ html[data-entrance="loading"] .hero-actions {
   contain: layout paint;
 }
 
-/* The poster is a still of the scene: it paints immediately, and stays if the scene cannot run. */
+/* The poster is the scene's own first frame. It paints once the frame has been
+   fitted, the live scene fades in over it in the same pose, and it stays if the
+   scene cannot run. */
 /* SplineContainer sizes this frame to the scene's own layout size and scales it to
-   fit the stage; until it has, the frame simply fills the stage. */
+   fit the stage, then marks it data-fitted. */
 .spline-frame {
   position: absolute;
   top: 0;
@@ -816,25 +606,41 @@ html[data-entrance="loading"] .hero-actions {
   height: 100%;
 }
 
-/* Shown at its natural size, centred: the same pixels the live scene draws there. */
+/* Shown at its natural size, centred: the same pixels the live scene draws there.
+   Held back until the frame is fitted, so it never shows at one size and then
+   jumps to another. If scripts never run it appears by itself. */
 .spline-poster {
   object-fit: none;
   object-position: center;
-  transition: opacity 500ms ease 300ms;
+  opacity: 0;
+  animation: spline-poster-failsafe 1ms linear 4s forwards;
+}
+
+@keyframes spline-poster-failsafe {
+  to { opacity: 1; }
+}
+
+.spline-frame[data-fitted] .spline-poster {
+  opacity: 1;
+  animation: none;
+  transition: opacity 400ms ease;
 }
 
 .spline-canvas {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 700ms ease;
+  transition: opacity 600ms ease;
 }
 
 .spline-stage.is-live .spline-canvas {
   opacity: 1;
 }
 
+/* The poster stays underneath until the scene has faded in over it, so the
+   handover never dips through the page behind. */
 .spline-stage.is-live .spline-poster {
   opacity: 0;
+  transition: opacity 0s linear 600ms;
 }
 
 .spline-label,
