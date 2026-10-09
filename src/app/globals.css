@@ -4279,6 +4279,61 @@ body:has(.service-page)::before {
   }
 }
 
+/* Phone screens: a row that scrolls sideways, with the next screen peeking in
+   at the edge. On wide screens it becomes one row with every other screen set
+   lower, the same step the uneven set takes. */
+.case-details-set.is-tall {
+  grid-auto-flow: column;
+  grid-auto-columns: min(68%, 17rem);
+  margin-inline: calc(-1 * var(--case-pad));
+  /* Room for the frames' shadows, which the scroller would otherwise clip */
+  margin-bottom: -2.5rem;
+  padding: 0 var(--case-pad) 3rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--case-pad);
+  scrollbar-width: none;
+}
+
+.case-details-set.is-tall::-webkit-scrollbar {
+  display: none;
+}
+
+.case-details-set.is-tall .case-details-item {
+  scroll-snap-align: start;
+}
+
+.case-details-set.is-tall .case-frame {
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 761px) {
+  .case-details-set.is-tall {
+    grid-template-columns: none;
+    gap: 1.5rem;
+  }
+
+  .case-details-set.is-tall .case-details-item {
+    grid-column: auto;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1101px) {
+  .case-details-set.is-tall {
+    grid-auto-columns: minmax(0, 1fr);
+    margin-inline: 0;
+    margin-bottom: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .case-details-set.is-tall .case-details-item:nth-child(even) {
+    margin-top: 4rem;
+  }
+}
+
 /* ── 5. Close ──────────────────────────────── */
 
 .case-close {

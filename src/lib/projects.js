@@ -50,4 +50,46 @@ export const projects = [
     challenge: "The community library needed a digital hub that not only made their extensive catalog easily searchable online but also served as a central place to discover and register for local community events.",
     solution: "We created a warm and accessible website featuring a fully integrated digital catalog, a dynamic event calendar with easy registration, and dedicated spaces to highlight community initiatives and reading groups."
   },
+  {
+    name: "Mymatchr",
+    slug: "mymatchr",
+    category: "Creator Marketplace App",
+    summary:
+      "A matchmaking app for the creator economy: brands find the micro-influencers who fit their campaigns, and micro-influencers find the brands worth working with.",
+    deliverables: ["Swipe-to-match Discovery", "Creator & Brand Analytics", "In-app Messaging"],
+    outcome: "Outcome: faster brand-creator matches, campaign fit backed by real numbers, and collaborations that start in the app.",
+    results: ["Faster brand-creator matches", "Campaign fit backed by numbers", "Collaborations that start in-app"],
+    image: "/mymatchr/cover.jpeg",
+    imageSize: [1920, 1020],
+    tone: "#6b200c",
+    challenge: "Micro-influencers are hard for brands to find, and brands are hard for small creators to reach. Outreach ran through cold DMs and spreadsheets, and neither side could judge whether the other was a good fit before the conversation started.",
+    solution: "We designed a two-sided app built around a swipe: brands browse creators, creators browse brands, and every card carries the numbers that matter. A mutual match opens a chat, detailed profiles show reach, engagement and packages, and a social feed keeps both sides active between campaigns.",
+    gallery: [
+      {
+        src: "/mymatchr/match.webp",
+        size: [900, 1956],
+        alt: "Mymatchr app screen showing a creator card over a brand card, under the line Where Brands and Creators Create Impact",
+      },
+      {
+        src: "/mymatchr/swipe.webp",
+        size: [900, 1956],
+        alt: "Swipe screen with creator profile cards fanned out either side of the phone",
+      },
+      {
+        src: "/mymatchr/analytics.webp",
+        size: [900, 1956],
+        alt: "Analytics screens for a creator profile and a brand profile, with reach, engagement and packages",
+      },
+      {
+        src: "/mymatchr/chat.webp",
+        size: [900, 1956],
+        alt: "In-app chat in which a brand invites a creator to collaborate on a campaign",
+      },
+      {
+        src: "/mymatchr/feed.webp",
+        size: [900, 1956],
+        alt: "Social feed with stories and posts from brands and creators",
+      },
+    ],
+  },
 ];

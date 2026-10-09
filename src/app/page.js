@@ -69,10 +69,10 @@ export default function Home() {
           <MotionReveal className="section-heading">
             <div>
               <p className="section-eyebrow">Selected Work</p>
-              <h2 className="section-title">Built for a&nbsp;classroom, a&nbsp;bakery and a&nbsp;library.</h2>
+              <h2 className="section-title">Built for a&nbsp;classroom, a&nbsp;bakery, a&nbsp;library and a&nbsp;creator app.</h2>
             </div>
             <p className="section-copy">
-              Three recent builds, each shaped around how the business actually
+              Four recent builds, each shaped around how the business actually
               runs. Open any one for the full case study.
             </p>
           </MotionReveal>

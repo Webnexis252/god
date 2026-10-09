@@ -23,7 +23,8 @@ import { projects } from "@/lib/projects";
    • Each section has its own layout: the opened
      plate, two stepped columns of reading text, three
      stacked lines, an uneven set of frames (only when
-     a project has gallery images), a closing line,
+     a project has gallery images; a stepped row when
+     they are phone screens), a closing line,
      and the next plate
    • This file stays a server component. Whatever
      moves with the scroll lives in a small client
@@ -87,6 +88,9 @@ export default async function CaseStudyPage({ params }) {
 
   const results = project.results ?? [];
   const gallery = project.gallery ?? [];
+  // Phone screens are set as one stepped row instead of the uneven set of wide frames
+  const isTallGallery =
+    gallery.length > 0 && gallery.every(({ size }) => size && size[1] > size[0]);
 
   return (
     <>
@@ -123,7 +127,7 @@ export default async function CaseStudyPage({ params }) {
           <section className="case-details">
             <h2 className="case-heading">Details</h2>
 
-            <ul className="case-details-set">
+            <ul className={`case-details-set${isTallGallery ? " is-tall" : ""}`}>
               {gallery.map((shot, index) => {
                 const [width, height] = shot.size ?? [1280, 680];
 
